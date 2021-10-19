@@ -1,0 +1,125 @@
+html
+    head
+        meta(charset="utf-8")
+        title Библиотека - #{book.name}
+        link(rel="shortcut icon", href="/public/images/book.png", type="image/x-icon")
+        link(rel="stylesheet", type="text/css", href="/public/stylesheets/w3.css")
+        script(type="text/javascript", src="/public/scripts/rest.js")
+        script(type="text/javascript", src="/public/scripts/book.js")
+
+    body(class="w3-light-grey")
+        include header.pug
+
+        div(id="modal-update-book", class="w3-modal")
+            div(class="w3-modal-content w3-card-4 w3-animate-zoom")
+                header(class="w3-container w3-indigo")
+                    span(onclick="closeUpdateForm();", class="w3-button w3-display-topright") &times;
+                    h4 Изменить книгу
+
+                div(class="w3-container w3-white")
+                    p
+                        label(class="w3-text-gray") Название книги
+                        input(id="update-book-form-name", class="w3-input w3-border", onchange="checkUpdateForm();", type="text", value=book.name)
+                    p
+                        label(class="w3-text-gray") Автор книги
+                        input(id="update-book-form-author", class="w3-input w3-border", onchange="checkUpdateForm();", type="text", value=book.author)
+                    p
+                        label(class="w3-text-gray") Дата выпуска
+                        input(id="update-book-form-release-date", class="w3-input w3-border", type="date", value=book.releaseDate)
+                    p
+                        label(class="w3-text-gray") Описание книги
+                        textarea(id="update-book-form-desc", class="w3-input w3-border", onchange="checkUpdateForm();") #{book.description}
+                    button(id="update-book-form-submit", class="w3-indigo w3-button w3-block w3-border w3-margin-bottom", onclick="updateBook(" + book.id + ");") Обновить
+                    div(id="update-book-form-message", style="display:none", class="w3-panel w3-display-container")
+                        span(onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright") &times;
+                        p(id="update-book-form-message-p")
+
+        div(id="modal-give-book", class="w3-modal")
+            div(class="w3-modal-content w3-card-4 w3-animate-zoom")
+                header(class="w3-container w3-indigo")
+                    span(onclick="closeGiveForm();", class="w3-button w3-display-topright") &times;
+                    h4 Выдать книгу
+
+                div(class="w3-container w3-white")
+                    p
+                        label(class="w3-text-gray") Имя держателя
+                        input(id="give-book-form-name", class="w3-input w3-border", onchange="checkGiveForm();", type="text")
+                    p
+                        label(class="w3-text-gray") Дата возврата
+                        input(id="give-book-form-return-date", class="w3-input w3-border", type="date", value="2022-01-01")
+                    button(id="give-book-form-submit", class="w3-indigo w3-button w3-block w3-border w3-margin-bottom", onclick="giveBook(" + book.id + ");", disabled) Выдать книгу
+                    div(id="give-book-form-message", style="display:none", class="w3-panel w3-display-container")
+                        span(onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright") &times;
+                        p(id="give-book-form-message-p")
+
+        div(id="modal-holder-info", class="w3-modal")
+            div(class="w3-modal-content w3-card-4 w3-animate-zoom")
+                header(class="w3-container w3-indigo")
+                    span(onclick="document.getElementById('modal-holder-info').style.display='none';", class="w3-button w3-display-topright") &times;
+                    h4 Информация о держателе
+
+                div(class="w3-container w3-white")
+                    p
+                        span(class="w3-text-dark-gray") Имя держателя:&nbsp
+                        if (book.holder)
+                            span(id="holder-info-name") #{book.holder.name}
+                        else
+                            span(id="holder-info-name") -
+                    p
+                        span(class="w3-text-dark-gray") Дата возврата:&nbsp
+                        if (book.holder)
+                            span(id="holder-info-return-date") #{book.holder.returnDate}
+                        else
+                            span(id="holder-info-return-date") -
+
+        section(class="w3-container")
+            div(class="w3-panel w3-white w3-border")
+                h4 Карточка книги
+                div(class="w3-white w3-border w3-col w3-margin-bottom", style="width: calc(80% - 20px); margin-right: 20px;")
+                    div(class="w3-container w3-border-bottom")
+                        p
+                            span(class="w3-text-dark-gray") Название книги:&nbsp
+                            span(id="book-name") #{book.name}
+                        p
+                            span(class="w3-text-dark-gray") Автор книги:&nbsp
+                            span(id="book-author") #{book.author}
+                        p
+                            span(class="w3-text-dark-gray") Дата выпуска:&nbsp
+                            span(id="book-release-date") #{book.releaseDate}
+                        p
+                            span(class="w3-text-dark-gray") В наличии:&nbsp
+                            if (book.available)
+                                span(id="book-available") Да
+                            else
+                                span(id="book-available") Нет
+                        if (book.holder)
+                            p(id="book-holder-p")
+                                span(class="w3-text-dark-gray") Держатель:&nbsp
+                                a(id="book-holder-name", href="#", onclick="document.getElementById('modal-holder-info').style.display='block'") #{book.holder.name}
+                            p(id="book-return-date-p")
+                                span(class="w3-text-dark-gray") Дата возврата:&nbsp
+                                span(id="book-return-date") #{book.holder.returnDate}
+                        else
+                            p(id="book-holder-p", style="display: none")
+                                span(class="w3-text-dark-gray") Держатель:&nbsp
+                                a(id="book-holder-name", href="", onclick="showHolder();")
+                            p(id="book-return-date-p", style="display: none")
+                                span(class="w3-text-dark-gray") Дата возврата:&nbsp
+                                span(id="book-return-date")
+
+                    div(class="w3-container")
+                        p(class="w3-text-dark-gray") Описание:
+                        p(id="book-description") #{book.description}
+
+                div(class="w3-white w3-border w3-col w3-margin-bottom", style="width: 20%; padding: 0px;")
+                    img(src="/public/images/default-book-cover.jpg" alt="Book Image" class="w3-right" style="width: 100%;")
+
+                div(class="w3-margin-bottom w3-left")
+                    if (book.holder)
+                        button(id="button-return-book", class="w3-indigo w3-button w3-border", onclick="returnBook(" + book.id + ");") Вернуть в библиотеку
+                        button(id="button-give-book", class="w3-indigo w3-button w3-border", onclick="document.getElementById('modal-give-book').style.display='block'", style="display: none;") Дать читателю
+                    else
+                        button(id="button-return-book", class="w3-indigo w3-button w3-border", onclick="returnBook(" + book.id + ");", style="display: none;") Вернуть в библиотеку
+                        button(id="button-give-book", class="w3-indigo w3-button w3-border", onclick="document.getElementById('modal-give-book').style.display='block'") Выдать книгу
+                    button(class="w3-indigo w3-button w3-border", onclick="document.getElementById('modal-update-book').style.display='block'") Изменить книгу
+                    button(class="w3-indigo w3-button w3-border", onclick="deleteBook(" + book.id + ");") Удалить книгу

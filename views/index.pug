@@ -1,0 +1,77 @@
+html
+    head
+        meta(charset="utf-8")
+        title Библиотека - Список книг
+        link(rel="shortcut icon", href="/public/images/book.png", type="image/x-icon")
+        link(rel="stylesheet", type="text/css", href="/public/stylesheets/w3.css")
+        script(type="text/javascript", src="/public/scripts/rest.js")
+        script(type="text/javascript", src="/public/scripts/index.js")
+
+    body(class="w3-light-grey", onload="sortBooks();")
+        include header.pug
+
+        div(id="modal-create-book", class="w3-modal")
+            div(class="w3-modal-content w3-card-4 w3-animate-zoom")
+                header(class="w3-container w3-indigo")
+                    span(onclick="document.getElementById('modal-create-book').style.display='none'", class="w3-button w3-display-topright") &times;
+                    h4 Добавить книгу
+
+                div(class="w3-container w3-white")
+                    p
+                        label(class="w3-text-gray") Название книги
+                        input(id="create-book-form-name", class="w3-input w3-border", onchange="checkForm();", type="text")
+                    p
+                        label(class="w3-text-gray") Автор книги
+                        input(id="create-book-form-author", class="w3-input w3-border", onchange="checkForm();", type="text")
+                    p
+                        label(class="w3-text-gray") Дата выпуска
+                        input(id="create-book-form-release-date", class="w3-input w3-border", type="date", value="2021-01-01")
+                    p
+                        label(class="w3-text-gray") Описание книги
+                        textarea(id="create-book-form-desc", class="w3-input w3-border", onchange="checkForm();")
+                    button(id="create-book-form-submit", class="w3-button w3-block w3-border w3-margin-bottom w3-indigo", onclick="createBook();", disabled) Добавить
+                    div(id="create-book-form-message", style="display:none", class="w3-panel w3-display-container")
+                        span(onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright") &times;
+                        p(id="create-book-form-message-p")
+
+
+        section(class="w3-container")
+            div(class="w3-panel w3-white w3-border w3-col", style="width: 20%; margin-right: 20px;")
+                h4 Меню
+                label(for="sort-select") Сортировка:
+                select(id="sort-select", class="w3-select w3-border w3-margin-bottom", onchange="sortBooks();")
+                    option(value="id", selected) По ID
+                    option(value="return-date") По дате возврата
+                    option(value="available") По наличию
+                button(class="w3-bar-item w3-button w3-block w3-indigo w3-margin-bottom", onclick="document.getElementById('modal-create-book').style.display='block'") Добавить книгу
+
+            div(class="w3-panel w3-white w3-border w3-col", style="width: calc(80% - 20px)")
+                h4 Список книг
+                table(class="w3-table-all w3-margin-bottom")
+                    thead
+                        tr(class="w3-indigo")
+                            th(class="w3-right-align") №
+                            th Название
+                            th Автор
+                            th(class="w3-center") Доступна
+                            th(class="w3-center") Дата возврата
+                            th
+
+                    tbody(id="books-table-body")
+                        - for (let i = 0; i < books.length; ++i)
+                            tr
+                                td(class="w3-right-align") #{books[i].id}
+                                td
+                                    a(href=`/books/${books[i].id}/card`) #{books[i].name}
+                                td #{books[i].author}
+                                if (books[i].available)
+                                    td(class="w3-center") Да
+                                else
+                                    td(class="w3-center") Нет
+                                if (books[i].holder)
+                                    td(class="w3-center") #{books[i].holder.returnDate}
+                                else
+                                    td(class="w3-center") -
+                                td(class="w3-center")
+                                    button(onclick="deleteBook(" + books[i].id + ")", style="padding: 2px;", class="w3-button w3-circle")
+                                        img(style="width: 15px", src="/public/images/delete.png")
